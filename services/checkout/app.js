@@ -1,14 +1,35 @@
 const express = require('express');
-const app = express();
+const { Client } = require('pg');
 
+const app = express();
 const PORT = 3003;
 
 app.use(express.json());
 
-// Request logging (for tracing)
+// DB connection
+const db = new Client({
+  host: 'postgres-svc',
+  user: 'postgres',
+  password: 'mypassword',
+  database: 'shop',
+  port: 5432,
+});
+
+db.connect()
+  .then(() => console.log("Connected to Postgres"))
+  .catch(err => console.error("DB connection error:", err));
+
+// Request logging (structured)
 app.use((req, res, next) => {
   const rid = req.header('X-Request-Id') || 'no-id';
-  console.log(`[rid=${rid}] ${req.method} ${req.path}`);
+
+  console.log(JSON.stringify({
+    requestId: rid,
+    service: "checkout",
+    method: req.method,
+    path: req.path
+  }));
+
   next();
 });
 
@@ -27,7 +48,6 @@ async function fetchWithTimeout(url, options = {}) {
       ...options,
       signal: controller.signal
     });
-
     return res;
   } catch (err) {
     console.error('Request failed:', err.message);
@@ -52,7 +72,7 @@ app.post('/checkout', async (req, res) => {
     return res.status(400).json({ error: 'sku and subtotal required' });
   }
 
-  // 1️⃣ Check inventory (WITH HEADER)
+  // Inventory call
   const invRes = await fetchWithTimeout(
     `${INVENTORY_URL}/stock/${sku}`,
     {
@@ -76,7 +96,7 @@ app.post('/checkout', async (req, res) => {
     });
   }
 
-  // 2️⃣ Get pricing (WITH HEADER)
+  // Pricing call
   const priceRes = await fetchWithTimeout(
     `${PRICING_URL}/price`,
     {
@@ -97,7 +117,16 @@ app.post('/checkout', async (req, res) => {
 
   const pricing = await priceRes.json();
 
-  // 3️⃣ Success response
+  // Insert into DB
+  try {
+    await db.query(
+      "INSERT INTO orders(note) VALUES($1)",
+      [`order for sku ${sku}`]
+    );
+  } catch (err) {
+    console.error("DB insert failed:", err.message);
+  }
+
   return res.json({
     sku,
     ...pricing,

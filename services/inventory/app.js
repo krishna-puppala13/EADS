@@ -8,7 +8,13 @@ app.use(express.json());
 // Request logging (for tracing later)
 app.use((req, res, next) => {
   const rid = req.header('X-Request-Id') || 'no-id';
-  console.log(`[rid=${rid}] ${req.method} ${req.path}`);
+
+  console.log(JSON.stringify({
+    requestId: rid,
+    service: "pricing",
+    method: req.method,
+    path: req.path
+  }));
   next();
 });
 
