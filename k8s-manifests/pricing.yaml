@@ -28,7 +28,7 @@ spec:
             httpGet:
               path: /health
               port: 3001
-            initialDelaySeconds: 2
+            initialDelaySeconds: 5
             periodSeconds: 5
 ---
 apiVersion: v1

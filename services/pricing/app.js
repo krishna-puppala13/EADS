@@ -5,7 +5,7 @@ const PORT = 3001;
 
 app.use(express.json());
 
-// Request logging (IMPORTANT for later tracing)
+// Request logging 
 app.use((req, res, next) => {
   const rid = req.header('X-Request-Id') || 'no-id';
 
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health endpoint (REQUIRED)
+// Health endpoint 
 app.get('/health', (req, res) => {
   res.json({ ok: true });
 });

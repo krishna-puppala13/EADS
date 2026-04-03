@@ -5,7 +5,7 @@ const PORT = 3002;
 
 app.use(express.json());
 
-// Request logging (for tracing later)
+// Request logging 
 app.use((req, res, next) => {
   const rid = req.header('X-Request-Id') || 'no-id';
 

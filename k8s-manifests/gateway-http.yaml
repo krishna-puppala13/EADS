@@ -1,0 +1,18 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: gateway
+  namespace: ca1
+spec:
+  hosts:
+    - localhost
+  pathPrefixes:
+    - /
+  scaleTargetRef:
+    name: gateway
+    service: gateway-svc
+    port: 80
+  replicas:
+    min: 0
+    max: 5
+  scaledownPeriod: 30
