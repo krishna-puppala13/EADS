@@ -16,26 +16,7 @@ The application is deployed on Kubernetes and exposed externally via Ingress (Tr
 ## Architecture
 
 ### System Architecture:
-
-               [ Browser / curl ]
-                       |
-                       v
-              [ Ingress (Traefik) ] 
-                       |
-                       v
-         [ KEDA HTTP Interceptor Proxy ]  
-                       |
-                       v
-          [ gateway-svc (NGINX / UI) ]  
-                       |
-                       v
-                [ checkout-svc ]  
-                       |
-         ┌─────────────┼─────────────┐
-         │             │             │
-         v             v             v
-  [ pricing-svc ] [ inventory-svc ] [ postgres-svc ]
-   (Get Price)      (Check Stock)      (Audit Log)
+![alt text](Images/Architecture.png)
 
 ### Request Flow:
 ![alt text](Images/Request_Flow.png)
