@@ -91,7 +91,7 @@ app.post('/checkout', async (req, res) => {
   const inventory = await invRes.json();
 
   if (!inventory.inStock) {
-    return res.status(400).json({
+    return res.status(409).json({
       error: 'Item out of stock'
     });
   }
@@ -128,6 +128,7 @@ app.post('/checkout', async (req, res) => {
   }
 
   return res.json({
+  requestID,
     sku,
     ...pricing,
     message: 'Checkout successful'
